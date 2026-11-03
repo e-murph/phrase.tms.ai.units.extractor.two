@@ -29,6 +29,25 @@ def csv_values(value):
     return [item.strip() for item in value.split(",") if item.strip()]
 
 
+def integer_values(env, input_name, variable_name, field, default="", workflow=False):
+    value = selected(env, input_name, variable_name, default)
+    manual = env.get(input_name, "").strip()
+    source = ("workflow input " + field if manual and manual != "configured" else
+              "Actions variable " + variable_name if env.get(variable_name, "").strip() else
+              "default for " + field)
+    help_text = ("Use workflow numbers from 1 to 15, for example 1 or 1,2; do not enter workflow names, all, or brackets."
+                 if workflow else
+                 "Use numeric TMS client IDs, for example 12345 or 12345,67890; do not enter client names or UIDs. "
+                 "To include all accessible clients, leave both client_ids and PHRASE_LEVERAGE_CLIENT_IDS blank.")
+    try:
+        result = tuple(int(item) for item in csv_values(value))
+    except ValueError:
+        raise ConfigurationError("Invalid " + source + ". " + help_text) from None
+    if workflow and (not result or any(not 1 <= level <= 15 for level in result)):
+        raise ConfigurationError("Invalid " + source + ". " + help_text)
+    return result
+
+
 def create_plan(env, now=None):
     now = now or datetime.now(timezone.utc)
     mode = selected(env, "INPUT_MODE", "PHRASE_REPORT_MODE", "usage").lower()
@@ -49,11 +68,11 @@ def create_plan(env, now=None):
         start = timestamp(env["INPUT_START"].strip()) if env.get("INPUT_START", "").strip() else \
             now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0) if period == "thisyear" else None
         end = timestamp(env["INPUT_END"].strip()) if env.get("INPUT_END", "").strip() else now
-        try:
-            clients = tuple(int(item) for item in csv_values(selected(env, "INPUT_CLIENT_IDS", "PHRASE_LEVERAGE_CLIENT_IDS")))
-            levels = tuple(int(item) for item in csv_values(selected(env, "INPUT_WORKFLOW_LEVELS", "PHRASE_LEVERAGE_WORKFLOW_LEVELS", "1")))
-        except ValueError:
-            raise ConfigurationError("Client IDs and workflow levels must be comma-separated integers.") from None
+        # Preserve resolved dates even if a later scope input fails validation.
+        plan["leverage_period"] = {"period_start": iso(start), "period_end": iso(end)}
+        clients = integer_values(env, "INPUT_CLIENT_IDS", "PHRASE_LEVERAGE_CLIENT_IDS", "client_ids")
+        levels = integer_values(env, "INPUT_WORKFLOW_LEVELS", "PHRASE_LEVERAGE_WORKFLOW_LEVELS",
+                                "report_workflow_levels", "1", workflow=True)
         owner = selected(env, "INPUT_ONLY_OWNER_ORG", "PHRASE_LEVERAGE_ONLY_OWNER_ORG", "false").lower()
         if owner not in {"true", "false"}:
             raise ConfigurationError("Analysis ownership configuration must be true or false.")
@@ -194,8 +213,9 @@ def leverage_arguments(plan):
 
 def run_leverage(plan, root=None):
     root = Path(root or Path.cwd()).resolve()
-    config = plan.get("leverage_settings", {})
-    period = (config.get("period_start") or "all available dates") + " <= analysis_created_at < " + (config.get("period_end") or "not configured") + " (UTC)"
+    config = plan.get("leverage_settings") or plan.get("leverage_period")
+    period = ((config.get("period_start") or "all available dates") + " <= analysis_created_at < " +
+              config["period_end"] + " (UTC)") if config else "not resolved (leverage configuration failed)"
     summary = initial_summary(plan, "leverage", period)
     error = plan.get("leverage_error")
     if not error and not os.environ.get("PHRASE_TMS_AUTHORIZATION", "").strip():
@@ -286,8 +306,13 @@ def main(argv=None):
             if plan["dates_are_leverage_only"]:
                 print("Optional start/end dates apply only to leverage; usage retains date=thisyear.")
             if plan["leverage"]:
-                settings = plan.get("leverage_settings", {})
-                print("Leverage reporting period (UTC): " + (settings.get("period_start") or "unbounded") + " inclusive to " + (settings.get("period_end") or "not configured") + " exclusive.")
+                settings = plan.get("leverage_settings") or plan.get("leverage_period")
+                if settings:
+                    print("Leverage reporting period (UTC): " + (settings.get("period_start") or "unbounded") + " inclusive to " + settings["period_end"] + " exclusive.")
+                else:
+                    print("Leverage reporting period: not resolved (configuration failed).")
+                if plan["leverage_error"]:
+                    print("Leverage configuration error: " + plan["leverage_error"], file=sys.stderr)
                 print("Leverage artifact upload: " + ("enabled" if plan["upload_artifacts"] else "disabled by repository confidentiality policy"))
             return 0
         plan = json.loads(os.environ.get("REPORT_CONFIGURATION", "{}"))

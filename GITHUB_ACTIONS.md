@@ -49,6 +49,14 @@ Configure nonsecret repository variables under **Settings → Secrets and variab
 
 For scheduled combined reports, choose `PHRASE_REPORT_MODE=both` and point `PHRASE_TMS_CREDENTIAL_SECRET` at an existing valid REST secret. **No secret is created, overwritten, printed, or copied by this integration.** No workflow settings were changed remotely by development tools.
 
+### Numeric filters and configuration errors
+
+Both `PHRASE_LEVERAGE_CLIENT_IDS` and `PHRASE_LEVERAGE_WORKFLOW_LEVELS` are optional. With neither set, blank manual fields select all accessible clients and workflow level 1.
+
+To save a workflow default, open **Settings → Secrets and variables → Actions → Variables → New repository variable**, set `PHRASE_LEVERAGE_WORKFLOW_LEVELS` to `1`, and save. Do not create `PHRASE_LEVERAGE_CLIENT_IDS` unless filtering is wanted; then use actual numeric TMS client IDs, such as `12345,67890` (illustrative numbers only). Client names, client UIDs, `all`, brackets and quoted lists are not valid numeric filters. For workflow levels use `1` or `1,2`, with values from 1 to 15; names such as `Translation` are not accepted. Different workflow levels remain separate reporting scopes.
+
+Nonblank manual `client_ids` / `report_workflow_levels` inputs override repository variables. Blank inputs inherit them. If a filter error is reported despite absent repository variables, check the manual inputs from that run and any inherited organization Actions variables. Start a **new** workflow dispatch with corrected inputs: rerunning the failed job reuses the original configuration. The planner now identifies the precise invalid input/Actions variable without echoing its value, preserves resolved reporting dates in diagnostics, and makes no Phrase requests for invalid configuration. Keep authentication values under **Secrets**, never under Variables or these numeric fields.
+
 The six secrets currently identified in this repository are the four embedded-dashboard URL/referer values and the two SMTP credentials. They remain sufficient for usage, but none provides TMS REST authorization. Selecting leverage with only those six secrets fails clearly. Usage in `both` still runs. Dashboard/email secret names are rejected as REST credential sources; embedded JWT URLs are never repurposed as Bearer tokens. Live leverage requires a securely provisioned, valid REST credential and appropriate project/analysis access.
 
 ## Dates and timezone

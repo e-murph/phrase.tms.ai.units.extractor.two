@@ -107,6 +107,49 @@ class PlanTests(unittest.TestCase):
         self.assertFalse(automation.create_plan({"INPUT_MODE": "leverage", "REPOSITORY_PRIVATE": "true", "PHRASE_LEVERAGE_ARTIFACTS": "false"}, NOW)["upload_artifacts"])
         self.assertTrue(automation.create_plan({"INPUT_MODE": "leverage", "PHRASE_LEVERAGE_ARTIFACTS": "true"}, NOW)["upload_artifacts"])
 
+    def test_integer_errors_name_the_exact_input_or_actions_variable(self):
+        for key, source in (("INPUT_CLIENT_IDS", "workflow input client_ids"),
+                            ("INPUT_WORKFLOW_LEVELS", "workflow input report_workflow_levels"),
+                            ("PHRASE_LEVERAGE_CLIENT_IDS", "Actions variable PHRASE_LEVERAGE_CLIENT_IDS"),
+                            ("PHRASE_LEVERAGE_WORKFLOW_LEVELS", "Actions variable PHRASE_LEVERAGE_WORKFLOW_LEVELS")):
+            with self.subTest(key=key):
+                invalid = "untrusted-private-value"
+                plan = automation.create_plan({"INPUT_MODE": "both", key: invalid}, NOW)
+                self.assertIn(source, plan["leverage_error"])
+                self.assertNotIn(invalid, plan["leverage_error"])
+                self.assertTrue(plan["usage"])
+                self.assertEqual("2026-01-01T00:00:00Z", plan["leverage_period"]["period_start"])
+                self.assertEqual("2026-11-03T16:00:00Z", plan["leverage_period"]["period_end"])
+
+    def test_blank_numeric_inputs_inherit_repository_variables_or_safe_defaults(self):
+        plan = automation.create_plan({"INPUT_MODE": "leverage", "INPUT_CLIENT_IDS": " ", "INPUT_WORKFLOW_LEVELS": " "}, NOW)
+        self.assertIsNone(plan["leverage_error"])
+        self.assertEqual((), plan["leverage_settings"]["client_ids"])
+        self.assertEqual((1,), plan["leverage_settings"]["report_workflow_levels"])
+        plan = automation.create_plan({"INPUT_MODE": "leverage", "INPUT_CLIENT_IDS": "", "PHRASE_LEVERAGE_CLIENT_IDS": "Client Name"}, NOW)
+        self.assertIn("Actions variable PHRASE_LEVERAGE_CLIENT_IDS", plan["leverage_error"])
+
+    def test_valid_numeric_overrides_and_workflow_range_validation(self):
+        plan = automation.create_plan({"INPUT_MODE": "leverage", "INPUT_CLIENT_IDS": " 12345, 67890 ",
+                                       "PHRASE_LEVERAGE_CLIENT_IDS": "invalid-inherited-value", "INPUT_WORKFLOW_LEVELS": "2,1,2"}, NOW)
+        self.assertIsNone(plan["leverage_error"])
+        self.assertEqual((12345, 67890), plan["leverage_settings"]["client_ids"])
+        self.assertEqual((1, 2), plan["leverage_settings"]["report_workflow_levels"])
+        for value in ("[1,2]", "Translation", "all", "0", "16", ","):
+            with self.subTest(value=value):
+                plan = automation.create_plan({"INPUT_MODE": "both", "INPUT_WORKFLOW_LEVELS": value}, NOW)
+                self.assertIn("workflow input report_workflow_levels", plan["leverage_error"])
+                self.assertTrue(plan["usage"])
+
+    def test_scope_failure_logs_resolved_period_and_makes_no_api_requests(self):
+        plan = automation.create_plan({"INPUT_MODE": "leverage", "INPUT_WORKFLOW_LEVELS": "Translation"}, NOW)
+        with tempfile.TemporaryDirectory() as directory, patch("requests.sessions.Session.request", side_effect=AssertionError("No HTTP")), \
+                redirect_stdout(StringIO()) as output, redirect_stderr(StringIO()) as errors:
+            self.assertEqual(2, automation.run_leverage(plan, directory))
+        self.assertIn("2026-01-01T00:00:00Z <= analysis_created_at < 2026-11-03T16:00:00Z", output.getvalue())
+        self.assertIn("workflow input report_workflow_levels", errors.getvalue())
+        self.assertIn("Failed API requests: 0", output.getvalue())
+
     def test_plan_contains_secret_names_only_and_no_credential_values(self):
         value = "private-runtime-authorization-value"
         plan = automation.create_plan({"INPUT_MODE": "both", "PHRASE_TMS_AUTHORIZATION": value, "EMAIL_PASSWORD": value}, NOW)
