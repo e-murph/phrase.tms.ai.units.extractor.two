@@ -3,18 +3,152 @@ name: Phrase AI Scraper
 on:
   schedule:
     - cron: '0 16 * * 0'  # Automatic: Sundays at 4pm UTC
-  workflow_dispatch:      # Manual: Adds button to GitHub
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Processes to run (scheduled default is configured separately)
+        type: choice
+        options: [usage, leverage, both]
+        default: usage
+      start:
+        description: Inclusive leverage ISO date/time (UTC); usage retains thisyear
+        type: string
+      end:
+        description: Exclusive leverage ISO date/time (UTC); defaults to frozen run time
+        type: string
+      credential_secret:
+        description: Existing REST secret name; blank uses PHRASE_TMS_CREDENTIAL_SECRET variable
+        type: string
+      auth_scheme:
+        description: Authentication type for an unprefixed REST token
+        type: choice
+        options: [configured, ApiToken, Bearer]
+        default: configured
+      region:
+        description: Phrase data center
+        type: choice
+        options: [configured, EU, US]
+        default: configured
+      period:
+        description: Leverage analysis creation period
+        type: choice
+        options: [configured, thisyear, all]
+        default: configured
+      project_uids:
+        description: Comma-separated leverage project UIDs; blank uses repository configuration
+        type: string
+      client_ids:
+        description: Comma-separated numeric leverage client IDs; blank uses repository configuration
+        type: string
+      report_workflow_levels:
+        description: Comma-separated reporting levels; blank uses repository configuration (default 1)
+        type: string
+  workflow_call:
+    inputs:
+      mode:
+        type: string
+        default: usage
+      start:
+        type: string
+        default: ''
+      end:
+        type: string
+        default: ''
+      credential_secret:
+        type: string
+        default: ''
+      auth_scheme:
+        type: string
+        default: configured
+      region:
+        type: string
+        default: configured
+      period:
+        type: string
+        default: configured
+      project_uids:
+        type: string
+        default: ''
+      client_ids:
+        type: string
+        default: ''
+      report_workflow_levels:
+        type: string
+        default: ''
+      only_owner_org:
+        type: string
+        default: configured
 
 permissions:
   contents: read
 
+concurrency:
+  group: phrase-reporting-${{ github.repository }}
+  cancel-in-progress: false
+
+env:
+  TZ: UTC
+  PYTHONUTF8: '1'
+
 jobs:
-  build:
+  configure:
     runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      usage: ${{ steps.plan.outputs.usage }}
+      leverage: ${{ steps.plan.outputs.leverage }}
+      configuration: ${{ steps.plan.outputs.configuration }}
+      credential_secret: ${{ steps.plan.outputs.credential_secret }}
+      upload_artifacts: ${{ steps.plan.outputs.upload_artifacts }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: '3.10'
+      - name: Select mode and reporting periods
+        id: plan
+        env:
+          INPUT_MODE: ${{ inputs.mode }}
+          INPUT_START: ${{ inputs.start }}
+          INPUT_END: ${{ inputs.end }}
+          INPUT_CREDENTIAL_SECRET: ${{ inputs.credential_secret }}
+          INPUT_AUTH_SCHEME: ${{ inputs.auth_scheme }}
+          INPUT_REGION: ${{ inputs.region }}
+          INPUT_PERIOD: ${{ inputs.period }}
+          INPUT_PROJECT_UIDS: ${{ inputs.project_uids }}
+          INPUT_CLIENT_IDS: ${{ inputs.client_ids }}
+          INPUT_WORKFLOW_LEVELS: ${{ inputs.report_workflow_levels }}
+          INPUT_ONLY_OWNER_ORG: ${{ inputs.only_owner_org }}
+          PHRASE_REPORT_MODE: ${{ vars.PHRASE_REPORT_MODE }}
+          PHRASE_TMS_CREDENTIAL_SECRET: ${{ vars.PHRASE_TMS_CREDENTIAL_SECRET }}
+          PHRASE_TMS_AUTH_SCHEME: ${{ vars.PHRASE_TMS_AUTH_SCHEME }}
+          PHRASE_TMS_REGION: ${{ vars.PHRASE_TMS_REGION }}
+          PHRASE_LEVERAGE_PERIOD: ${{ vars.PHRASE_LEVERAGE_PERIOD }}
+          PHRASE_LEVERAGE_PROJECT_UIDS: ${{ vars.PHRASE_LEVERAGE_PROJECT_UIDS }}
+          PHRASE_LEVERAGE_CLIENT_IDS: ${{ vars.PHRASE_LEVERAGE_CLIENT_IDS }}
+          PHRASE_LEVERAGE_WORKFLOW_LEVELS: ${{ vars.PHRASE_LEVERAGE_WORKFLOW_LEVELS }}
+          PHRASE_LEVERAGE_ONLY_OWNER_ORG: ${{ vars.PHRASE_LEVERAGE_ONLY_OWNER_ORG }}
+          PHRASE_LEVERAGE_ARTIFACTS: ${{ vars.PHRASE_LEVERAGE_ARTIFACTS }}
+          REPOSITORY_PRIVATE: ${{ github.event.repository.private }}
+        run: python automation.py plan
+
+  build:
+    name: Existing AI usage reports
+    needs: configure
+    if: needs.configure.outputs.usage == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    outputs:
+      summary: ${{ steps.scraper.outputs.summary }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
@@ -28,27 +162,32 @@ jobs:
 
       # --- 1. RUN THE PYTHON SCRIPT TO SCRAPE AND TRANSFORM DATA FROM PHRASE TMS  ---
       - name: Run scraper
+        id: scraper
         env:
+          REPORT_CONFIGURATION: ${{ needs.configure.outputs.configuration }}
           PHRASE_API_URL: ${{ secrets.PHRASE_API_URL }}
           PHRASE_REFERER: ${{ secrets.PHRASE_REFERER }}
           PHRASE_API_URL_WORDS: ${{ secrets.PHRASE_API_URL_WORDS }}
           PHRASE_REFERER_WORDS: ${{ secrets.PHRASE_REFERER_WORDS }}
-        run: python main.py
+        run: python automation.py usage
 
       # --- 2. ZIP AND SEND ALL LOGS TO THE WORKFLOW TEAM  ---
       - name: Zip Excel Reports
+        id: all_zip
         run: |
           shopt -s nullglob
           files=( *.xlsx )
 
           if [ ${#files[@]} -eq 0 ]; then
             echo "No Excel files found. Skipping Weekly_Phrase_Usage_Reports.zip creation."
-            exit 0
+            exit 1
           fi
 
           zip Weekly_Phrase_Usage_Reports.zip "${files[@]}"
+          echo "created=true" >> "$GITHUB_OUTPUT"
 
       - name: Send Email with Zip Attachment
+        if: ${{ !cancelled() && steps.all_zip.outcome == 'success' && steps.all_zip.outputs.created == 'true' }}
         uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
         with:
           # SMTP Server Configuration (Default is Gmail)
@@ -85,18 +224,23 @@ jobs:
 
       # --- 3. ZIP AND SEND PRODUCT LOGS TO SUSE PM TEAM ---
       - name: Zip Product Reports
+        id: product_zip
+        if: ${{ !cancelled() && steps.scraper.outcome == 'success' }}
         run: |
           shopt -s nullglob
           files=( SUSE_Cloud-Native_Product_*.xlsx )
 
           if [ ${#files[@]} -eq 0 ]; then
             echo "No SUSE Product Excel files found. Skipping Weekly_Phrase_SUSE_Cloud-Native_Usage_Reports.zip creation."
+            echo "created=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           zip Weekly_Phrase_SUSE_Cloud-Native_Usage_Reports.zip "${files[@]}"
+          echo "created=true" >> "$GITHUB_OUTPUT"
 
       - name: Send Product Email
+        if: ${{ !cancelled() && steps.product_zip.outcome == 'success' && steps.product_zip.outputs.created == 'true' }}
         uses: dawidd6/action-send-mail@2cea9617b09d79a095af21254fbcb7ae95903dde
         with:
           server_address: smtp.gmail.com
@@ -127,3 +271,63 @@ jobs:
             This is an automated message generated directly from GitHub Actions.
           
           attachments: "Weekly_Phrase_SUSE_Cloud-Native_Usage_Reports.zip"
+
+  leverage:
+    name: Read-only leverage reports
+    needs: configure
+    if: needs.configure.outputs.leverage == 'true'
+    runs-on: ubuntu-22.04
+    timeout-minutes: 60
+    outputs:
+      summary: ${{ steps.extract.outputs.summary }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: '3.10'
+      - name: Install existing dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Retrieve and validate existing analyses
+        id: extract
+        env:
+          REPORT_CONFIGURATION: ${{ needs.configure.outputs.configuration }}
+          PHRASE_TMS_AUTHORIZATION: ${{ secrets[needs.configure.outputs.credential_secret] }}
+        run: python automation.py leverage
+      - name: Upload current CSV and JSON reports
+        if: ${{ !cancelled() && needs.configure.outputs.upload_artifacts == 'true' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: Phrase-Leverage-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            reports/leverage/*Phrase_Leverage_Stats*.csv
+            reports/leverage/*Phrase_Leverage_Stats*.json
+            reports/leverage/manifest.json
+            reports/leverage/coverage.csv
+            reports/automation/leverage_run.json
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Explain artifact policy
+        if: ${{ !cancelled() && needs.configure.outputs.upload_artifacts != 'true' }}
+        run: echo "Artifact upload is disabled by repository configuration. No client data was published as an artifact."
+
+  reporting_summary:
+    name: Reporting outcome
+    needs: [configure, build, leverage]
+    if: always()
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          persist-credentials: false
+      - name: Publish counts and preserve failure status
+        env:
+          SELECTED_MODE: ${{ needs.configure.outputs.mode }}
+          CONFIGURE_RESULT: ${{ needs.configure.result }}
+          USAGE_RESULT: ${{ needs.build.result }}
+          LEVERAGE_RESULT: ${{ needs.leverage.result }}
+          USAGE_SUMMARY: ${{ needs.build.outputs.summary }}
+          LEVERAGE_SUMMARY: ${{ needs.leverage.outputs.summary }}
+        run: python automation.py summary

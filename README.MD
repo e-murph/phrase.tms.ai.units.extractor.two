@@ -1,5 +1,11 @@
 # Phrase TMS Data Extractor (AI Units & Wordcounts)
 
+GitHub Actions supports `usage`, `leverage`, and `both` modes through **Phrase AI Scraper**, retaining the existing Sunday 16:00 UTC schedule and default usage reports. See [GITHUB_ACTIONS.md](GITHUB_ACTIONS.md) for manual execution, scheduled configuration, secrets, privacy, artifacts, and failure handling. Direct `python main.py` usage and AI workbook outputs remain unchanged. The configured dashboard/email secrets do not themselves provide TMS REST authorization.
+
+Validated detailed, project, and client CSV reports plus structured JSON are described in [LEVERAGE_REPORTS.md](LEVERAGE_REPORTS.md).
+
+The [validation report](LEVERAGE_VALIDATION_REPORT.md) documents the 147-test review, accuracy fixes, dependency security minimums, and required live reconciliation. Install the full requirements in a clean environment; existing global HTTP libraries may not meet the security minimums. Synthetic validation does not establish live Phrase reporting accuracy.
+
 A Python utility that bypasses the Phrase TMS web interface to pull "AI Units" and "Wordcount" data directly from the underlying Metabase API. 
 
 ## 🚀 Features
@@ -70,17 +76,14 @@ The ZIP file will contain:
 * `Unmapped_Projects_Usage_Stats.xlsx`
 * `Master_Phrase_Usage_Stats.xlsx`
 
-### Manual Trigger & Artifact Download
-If you need a report right now, or want to download the raw Excel files directly from GitHub without checking your email:
+### Manual Trigger & Leverage Artifact Download
+If you need a report right now:
 1.  Navigate to the **Actions** tab in the GitHub repository.
 2.  Select **Phrase AI Scraper** from the left sidebar.
-3.  Click the **Run workflow** dropdown and select the green button.
+3.  Click **Run workflow**, choose `usage`, `leverage`, or `both`, and select the green button. The default is `usage`.
 
-### How to Download the Excel Files
-Since the script runs in the cloud, the file is saved as a GitHub "Artifact":
-1.  Once the workflow finishes (green checkmark), click number under **Artifacts** at the top of the page.
-2.  Scroll down to the **Artifacts** section at the bottom of the page.
-3.  Click **Phrase-AI-Usage-Report** to download a zip file containing the timestamped Excel spreadsheets.
+### How to Download Leverage Reports
+Usage Excel files retain their existing ZIP-by-email delivery. When leverage artifact upload is allowed, open the run's **Artifacts** section and download **Phrase-Leverage-<run-id>-<attempt>** for CSV/JSON reports and diagnostics. Private repositories upload by default; public repositories require explicit configuration after confidentiality review. See [GITHUB_ACTIONS.md](GITHUB_ACTIONS.md). The previous README's `Phrase-AI-Usage-Report` artifact instructions did not match the original workflow.
 
 ## 🛠️ Local Development
 If you want to run the script on your own machine:

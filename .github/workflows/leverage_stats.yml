@@ -1,0 +1,66 @@
+name: Phrase Leverage Extractor
+
+on:
+  workflow_dispatch:
+    inputs:
+      credential_secret:
+        description: Existing GitHub secret containing a TMS REST token/header (not dashboard or email secrets)
+        required: true
+        type: string
+      auth_scheme:
+        description: Authentication type for an unprefixed token
+        type: choice
+        options: [ApiToken, Bearer]
+        default: ApiToken
+      region:
+        description: Phrase data center
+        type: choice
+        options: [EU, US]
+        default: EU
+      period:
+        description: Analysis creation period (explicit dates override it)
+        type: choice
+        options: [thisyear, all]
+        default: thisyear
+      start:
+        description: Inclusive ISO date/time; optional
+        type: string
+      end:
+        description: Exclusive ISO date/time; optional
+        type: string
+      project_uids:
+        description: Comma-separated project UIDs; blank discovers all accessible projects
+        type: string
+      client_ids:
+        description: Comma-separated numeric client IDs; optional
+        type: string
+      only_owner_org:
+        description: Include only analyses owned by your organization
+        type: boolean
+        default: false
+      report_workflow_levels:
+        description: Comma-separated workflow levels for separate reporting scopes
+        type: string
+        default: '1'
+
+permissions:
+  contents: read
+
+
+jobs:
+  reports:
+    # Compatibility entry point; all execution is implemented in the original workflow.
+    uses: ./.github/workflows/scrape_stats.yml
+    with:
+      mode: leverage
+      start: ${{ inputs.start }}
+      end: ${{ inputs.end }}
+      credential_secret: ${{ inputs.credential_secret }}
+      auth_scheme: ${{ inputs.auth_scheme }}
+      region: ${{ inputs.region }}
+      period: ${{ inputs.period }}
+      project_uids: ${{ inputs.project_uids }}
+      client_ids: ${{ inputs.client_ids }}
+      report_workflow_levels: ${{ inputs.report_workflow_levels }}
+      only_owner_org: ${{ inputs.only_owner_org && 'true' || 'false' }}
+    secrets: inherit

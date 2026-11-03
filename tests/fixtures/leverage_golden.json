@@ -1,0 +1,30 @@
+{
+  "description": "Synthetic, hand-calculated source-unit PreAnalyse pricing example; not live Phrase data.",
+  "categories": [
+    ["transMemoryMatches", "match101", "100", "0"],
+    ["transMemoryMatches", "match100", "200", "40"],
+    ["transMemoryMatches", "match95", "150", "75"],
+    ["transMemoryMatches", "match0", "100", "100"],
+    ["machineTranslationMatches", "match95", "100", "50"],
+    ["nonTranslatablesMatches", "match99", "50", "0"],
+    ["internalFuzzyMatches", "match75", "100", "50"],
+    ["repetitions", null, "200", "20"]
+  ],
+  "jobs": [
+    {"uid": "D1", "project": "P1", "target": "de", "factor": "1", "gross": "1000", "net": "335"},
+    {"uid": "D2", "project": "P1", "target": "de", "factor": "0.5", "gross": "500", "net": "167.5"},
+    {"uid": "F1", "project": "P1", "target": "fr", "factor": "0.7", "gross": "700", "net": "234.5"},
+    {"uid": "D3", "project": "P2", "target": "de", "factor": "1", "gross": "1000", "net": "335"},
+    {"uid": "F2", "project": "P2", "target": "fr", "factor": "2", "gross": "2000", "net": "670"}
+  ],
+  "projects": [
+    {"project": "P1", "target": "de", "gross": "1500", "net": "502.5", "saved": "997.5", "jobs": 2, "tm": "825", "mt": "150", "nt": "75", "internal": "150", "repetition": "300"},
+    {"project": "P1", "target": "fr", "gross": "700", "net": "234.5", "saved": "465.5", "jobs": 1, "tm": "385", "mt": "70", "nt": "35", "internal": "70", "repetition": "140"},
+    {"project": "P2", "target": "de", "gross": "1000", "net": "335", "saved": "665", "jobs": 1, "tm": "550", "mt": "100", "nt": "50", "internal": "100", "repetition": "200"},
+    {"project": "P2", "target": "fr", "gross": "2000", "net": "670", "saved": "1330", "jobs": 1, "tm": "1100", "mt": "200", "nt": "100", "internal": "200", "repetition": "400"}
+  ],
+  "clients": [
+    {"target": "de", "gross": "2500", "net": "837.5", "saved": "1662.5", "jobs": 3, "tm": "1375", "mt": "250", "nt": "125", "internal": "250", "repetition": "500"},
+    {"target": "fr", "gross": "2700", "net": "904.5", "saved": "1795.5", "jobs": 2, "tm": "1485", "mt": "270", "nt": "135", "internal": "270", "repetition": "540"}
+  ]
+}

@@ -1,0 +1,5 @@
+# Security floors reviewed 2026-11-03; these are existing requests dependencies.
+# GHSA-6q48-6c7w-9gw2, GHSA-65pc-fj4g-8rjx, and urllib3's 2026 advisories.
+certifi>=2026.10.18
+idna>=3.15
+urllib3>=2.8.0

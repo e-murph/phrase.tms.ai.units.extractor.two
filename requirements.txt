@@ -1,4 +1,5 @@
-requests
+-c constraints-security.txt
+requests>=2.33.0
 pandas
 openpyxl
 python-dotenv
