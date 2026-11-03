@@ -1,0 +1,250 @@
+{
+  "languages": [
+    {"code": "de-DE", "name": "German"},
+    {"code": "fr-FR", "name": "French"},
+    {"code": "es-ES", "name": "Spanish"},
+    {"code": "ja-JP", "name": "Japanese"},
+    {"code": "pt-BR", "name": "Brazilian Portuguese"},
+    {"code": "zh-CN", "name": "Simplified Chinese"}
+  ],
+  "products": [
+    {
+      "product_name": "Cluster API v0.26",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 3",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 3",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 4",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 3",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 3",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 3"
+      }
+    },
+    {
+      "product_name": "Elemental 1.8",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 4",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 4",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 5",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 4",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 4",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 4"
+      }
+    },
+    {
+      "product_name": "SUSE Observability",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 5",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 5",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 6",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 5",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 5",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 5"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Prime - K3s",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 6",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 6",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 7",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 6",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 6",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 6"
+      }
+    },
+    {
+      "product_name": "SUSE Admission Policy Manager (Kubewarden)",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 7",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 7",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 8",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 7",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 7",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 7"
+      }
+    },
+    {
+      "product_name": "SUSE RKE2 Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 8",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 8",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 9",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 8",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 8",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 8"
+      }
+    },
+    {
+      "product_name": "SUSE Storage (Longhorn) Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 9",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 9",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 10",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 9",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 9",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 9"
+      }
+    },
+    {
+      "product_name": "SUSE Harvester Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 10",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 10",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 11",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 10",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 10",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 10"
+      }
+    },
+    {
+      "product_name": "SUSE Virtual Cluster (k3k)",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 11",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 11",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 12",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 11",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 11",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 11"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Prime Continuous Delivery (Fleet)",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 12",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 12",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 13",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 12",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 12",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 12"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Prime AI Assistant",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 13",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 13",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 14",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 13",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 13",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 13"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Developer Access",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 14",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 14",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 15",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 14",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 14",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 14"
+      }
+    },
+    {
+      "product_name": "SUSE NeuVector Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 15",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 15",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 16",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 15",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 15",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 15"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Prime Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 16",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 16",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 17",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 16",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 16",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 16"
+      }
+    },
+    {
+      "product_name": "SUSE Rancher Prime Product Docs (missing file)",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 18",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 18",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 19",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 18",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 18",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 18"
+      }
+    },
+    {
+      "product_name": "SUSE Private Registry Product Docs",
+      "projects": {
+        "de-DE": "SUSE Cloud-Native GitHub Auto de-DE 19",
+        "es-ES": "SUSE Cloud-Native GitHub Auto es-ES 19",
+        "fr-FR": "SUSE Cloud-Native GitHub Auto fr-FR 20",
+        "ja-JP": "SUSE Cloud-Native GitHub Auto ja-JP 19",
+        "pt-BR": "SUSE Cloud-Native GitHub Auto pt-BR 19",
+        "zh-CN": "SUSE Cloud-Native GitHub Auto zh-CN 19"
+      }
+    },
+    {
+      "product_name": "SUSE Multi-Linux Manager 5.1 Docs",
+      "projects": {
+        "ja-JP": "SUSE MLM GitHub Auto ja-JP 1",
+        "ko-KR": "SUSE MLM GitHub Auto ko-KR 1",
+        "zh-CN": "SUSE MLM GitHub Auto zh-CN 1"
+      }
+    },
+    {
+      "product_name": "SUSE Multi-Linux Manager 5.1 Docs",
+      "projects": {
+        "ja-JP": "SUSE MLM GitHub Auto ja-JP 2",
+        "ko-KR": "SUSE MLM GitHub Auto ko-KR 2",
+        "zh-CN": "SUSE MLM GitHub Auto zh-CN 2"
+      }
+    },
+    {
+      "product_name": "SUSE Multi-Linux Manager 5.2 Docs",
+      "projects": {
+        "ja-JP": "SUSE MLM GitHub Auto ja-JP 3",
+        "ko-KR": "SUSE MLM GitHub Auto ko-KR 3",
+        "zh-CN": "SUSE MLM GitHub Auto zh-CN 3"
+      }
+    },
+    {
+      "product_name": "SUSE Edge 3.6 Docs",
+      "projects": {
+        "es-ES": "SUSE Edge GitHub Auto es-ES 1",
+        "ja-JP": "SUSE Edge GitHub Auto ja-JP 1",
+        "pt-BR": "SUSE Edge GitHub Auto pt-BR 1",
+        "zh-CN": "SUSE Edge GitHub Auto zh-CN 1"
+      }
+    },
+    {
+      "product_name": "SUSE Edge 3.6 Docs - error file",
+      "projects": {
+        "es-ES": "SUSE Edge GitHub Auto es-ES 3"
+      }
+    },
+    {
+      "product_name": "SUSE Edge 3.4 and 3.5 Docs",
+      "projects": {
+        "es-ES": "SUSE Edge GitHub Auto es-ES 4",
+        "ja-JP": "SUSE Edge GitHub Auto ja-JP 2",
+        "pt-BR": "SUSE Edge GitHub Auto pt-BR 2",
+        "zh-CN": "SUSE Edge GitHub Auto zh-CN 2"
+      }
+    },
+    {
+      "product_name": "SUSE Edge 3.4 and 3.5 Docs - error file",
+      "projects": {
+        "pt-BR": "SUSE Edge GitHub Auto pt-BR 3"
+      }
+    },
+    {
+      "product_name": "SUSE Multi-Linux Manager 5.2 Docs - Drop 2",
+      "projects": {
+        "ja-JP": "SUSE MLM GitHub Auto ja-JP 4",
+        "ko-KR": "SUSE MLM GitHub Auto ko-KR 4",
+        "zh-CN": "SUSE MLM GitHub Auto zh-CN 4"
+      }
+    }
+  ]
+}
